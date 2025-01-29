@@ -1,0 +1,14 @@
+
+
+echo 'Subject: Test email' | /usr/lib/sendmail -v email@emailaddress.com
+
+`date +%Y-%m-%d`
+
+find . -printf "%h\n" | cut -d/ -f-2 | sort | uniq -c | sort -rn
+
+mv index.php{,-bak.`date +%F-%T`}
+
+ack-grep "\[action\]" wp-content/__wpe_admin_ajax.log | sort | uniq -c | sort -nk1
+
+tail -2000 /var/log/nginx/apache-queue.access.log | awk -F\| '($4 == "domain.com"){print $3}' | sort | uniq -c | sort -rn | less
+cat apache-queue.access.log | awk -F\| '($4 == "domain.com" && $9 > 10.0){print $10}' | sort | uniq -c | sort -rn | less
