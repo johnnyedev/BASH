@@ -12,3 +12,8 @@ ack-grep "\[action\]" wp-content/__wpe_admin_ajax.log | sort | uniq -c | sort -n
 
 tail -2000 /var/log/nginx/apache-queue.access.log | awk -F\| '($4 == "domain.com"){print $3}' | sort | uniq -c | sort -rn | less
 cat apache-queue.access.log | awk -F\| '($4 == "domain.com" && $9 > 10.0){print $10}' | sort | uniq -c | sort -rn | less
+
+
+# count of different file types/extensions in a given folder
+for i in $(ll | awk '{print $9}'); do filename=$(basename "$i"); extension="${filename##*.}"; echo $extension; done | sort | uniq -c | sort -rn
+
