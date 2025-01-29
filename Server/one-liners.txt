@@ -17,3 +17,6 @@ cat apache-queue.access.log | awk -F\| '($4 == "domain.com" && $9 > 10.0){print 
 # count of different file types/extensions in a given folder
 for i in $(ll | awk '{print $9}'); do filename=$(basename "$i"); extension="${filename##*.}"; echo $extension; done | sort | uniq -c | sort -rn
 
+# Get current users on jumpbox 
+top -b -n 1 | awk '{print $2}' | sort | uniq
+
