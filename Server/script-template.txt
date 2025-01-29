@@ -1,0 +1,114 @@
+#!/bin/bash
+Written by: Johnny Ellis
+
+# Lsfun tags for indexing to list:
+lsfunNAME="";
+lsfunUSAGE="<>";
+lsfunDESCRIP="";
+lsfunCAT="";
+
+
+function SCRIPTNAMEChangeLog() {
+echo "##########################################################
+##		Changelog NAME				##
+##							##
+##							##
+##########################################################
+#  	Version = MAJOR.MINOR.PATCH
+#  	MAJOR version when you add functionality that doesn't work with existing code
+#	MINOR version when you add functionality that does work with existing code
+#	PATCH version when you make bug fixes that works with existing code.
+#
+#
+"
+}
+
+SCRIPTNAMEname="";
+SCRIPTNAMEversion="";
+SCRIPTNAMEdependicies="";
+
+#Script Colors
+SCRIPTNAMEBLUE="\033[34m";
+SCRIPTNAMEWHITE="\033[0;1m";
+SCRIPTNAMENC="\033[0m";
+
+function SCRIPTNAME() {	
+
+#Define Vars
+
+#Start Function
+	
+	if [[ -z $1 ]]; 
+	then
+		echo -e 'Usage: \n';
+
+	elif [[ $1 == '-v' || $1 == '--version' ]];
+	then
+		echo -e '\nFunction' $SCRIPTNAMEname 'is on version: \n' $SCRIPTNAMEversion '\n';
+
+	elif [[ $1 == '-c' || $1 == '--change-log' ]];
+	then
+		SCRIPTNAMEChangeLog;
+
+        elif [[ $1 == '-h' || $1 == '--help' ]];
+        then
+                SCRIPTNAMEHelpMenu;
+
+	elif [[ $1 == '-d' || $1 == '--dependencies' ]];
+	then	
+		echo -e '\nFunction' $SCRIPTNAMEname 'has the following dependent files: \n' $SCRIPTNAMEdependicies '\n';
+	elif [[ $1 == '-e' || $1 == '--example' ]]; 
+	then
+        	Do something;
+	
+	else
+		echo -e '\nInvalid Input\n';
+	fi
+}
+
+
+
+function SCRIPTNAMEHelpMenu() {
+
+echo "NAME
+     logtop -- gather the most hits from log
+
+SYNOPSIS
+     logtop <-a|as|c|d|h|n|v> <-codes|host|ip|referer|type|ua|uri>
+
+DESCRIPTION
+	Logtop will show the output from the most recent log, display the time range of the log in UTC and CST/CDT. 	
+    	
+	One of the following are required:
+
+	-a	Sets the log to the Apache access log.
+	
+	-as	Sets the log to the Apache Staging access log.	
+
+	-n	Sets the log to the Nginx Apachestyle log.
+
+	-c	Displays the changelog.
+
+	-d	Displays any other files the script is dependent on.
+
+	-h	Displays the help menu (what you are reading now).
+
+	-v	Displays the scripts current version.
+
+	Additionally the following options can be used:
+
+	-codes	Displays the top HTTP status codes hit.
+
+	-host	Displays the top hostnames used.
+
+	-ip	Displays the top IP's that hit.
+
+	-referer Displays the top referer's for the site.
+
+	-type	Displays the top request types (GET, HEAD, POST, OPTIONS, TRACE).
+
+	-ua	Displays the top user agents that hit.
+
+	-uri	Displays the top page URI's that were hit.
+"
+}
