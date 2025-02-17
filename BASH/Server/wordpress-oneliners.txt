@@ -1,0 +1,35 @@
+
+
+# Change Theme On Liner:
+mysql -u `awk -F\' '$2 == "DB_USER" { print $4 }' wp-config.php` -p`awk -F\' '$2 == "DB_PASSWORD" { print $4 }' wp-config.php` -h localhost `awk -F\' '$2 == "DB_NAME" { print $4 }' wp-config.php` -e "UPDATE wp_options SET option_value = 'twentyseventeen' WHERE option_name = 'template' OR option_name = 'stylesheet' OR option_name = 'current_theme'
+
+Improved Change Theme one Lliner
+clear && echo -e "Please enter the theme to use, followed by [ENTER]\nOr... leave blank for twentyseventeen" && read theme && theme=${theme:-twentyseventeen} && mysql -u `awk -F\' '$2 == "DB_USER" { print $4 }' wp-config.php` -p`awk -F\' '$2 == "DB_PASSWORD" { print $4 }' wp-config.php` -h localhost `awk -F\' '$2 == "DB_NAME" { print $4 }' wp-config.php` -e "UPDATE wp_options SET option_value = '$theme' WHERE option_name = 'template' OR option_name = 'stylesheet' OR option_name = 'current_theme'
+
+# Siteurl one liner:
+mysql -u `awk -F\' '$2 == "DB_USER" { print $4 }' wp-config.php` -p`awk -F\' '$2 == "DB_PASSWORD" { print $4 }' wp-config.php` -h localhost `awk -F\' '$2 == "DB_NAME" { print $4 }' wp-config.php` -e "UPDATE wp_options SET option_value = 'http://domain.com' WHERE option_name = 'home' OR option_name = 'siteurl'
+
+Improved Siteurl one liner:
+clear && echo "Please enter the correct Siteurl including http://, followed by [ENTER]" && read siteurl && mysql -u `awk -F\' '$2 == "DB_USER" { print $4 }' wp-config.php` -p`awk -F\' '$2 == "DB_PASSWORD" { print $4 }' wp-config.php` -h localhost `awk -F\' '$2 == "DB_NAME" { print $4 }' wp-config.php` -e "UPDATE wp_options SET option_value = '$siteurl' WHERE option_name = 'home' OR option_name = 'siteurl'
+
+Database creds:
+awk -F\' '$2 == "DB_NAME" { print "Database:      " $4 }' wp-config.php; awk -F\' '$2 == "DB_USER" { print "Database User: " $4 }' wp-config.php; awk -F\' '$2 == "DB_PASSWORD" { print "Password:      " $4 }' wp-config.php
+
+MySQL shell login
+mysql -u `awk -F\' '$2 == "DB_USER" { print $4 }' wp-config.php` -p`awk -F\' '$2 == "DB_PASSWORD" { print $4 }' wp-config.php` -h localhost `awk -F\' '$2 == "DB_NAME" { print $4 }' wp-config.php`
+
+Database Dump:
+mysqldump -u `awk -F\' '$2 == "DB_USER" { print $4 }' wp-config.php` -p`awk -F\' '$2 == "DB_PASSWORD" { print $4 }' wp-config.php` -h localhost `awk -F\' '$2 == "DB_NAME" { print $4 }' wp-config.php` > `awk -F\' '$2 == "DB_NAME" { print $4 }' wp-config.php``date +%m-%d-%y`.sql
+
+Database import:
+mysql -u `awk -F\' '$2 == "DB_USER" { print $4 }' wp-config.php` -p`awk -F\' '$2 == "DB_PASSWORD" { print $4 }' wp-config.php` -h localhost `awk -F\' '$2 == "DB_NAME" { print $4 }' wp-config.php` < DumpFile.sql
+
+Core File Replacement:
+wget --no-check-certificate https://wordpress.org/wordpress-`awk -F\' '$1 == "$wp_version = " { print $2 }' wp-includes/version.php`.zip && unzip wordpress-`awk -F\' '$1 == "$wp_version = " { print $2 }' wp-includes/version.php`.zip && cp -rf wordpress/* ../
+
+Disable plugins:
+DPLUG=$(mysql -u `awk -F\' '$2 == "DB_USER" { print $4 }' wp-config.php` -p`awk -F\' '$2 == "DB_PASSWORD" { print $4 }' wp-config.php` -h localhost `awk -F\' '$2 == "DB_NAME" { print $4 }' wp-config.php` -e "SELECT option_value FROM wp_options WHERE option_name = 'active_plugins';" | awk -F"option_value" '{ print $1}') && mysql -u `awk -F\' '$2 == "DB_USER" { print $4 }' wp-config.php` -p`awk -F\' '$2 == "DB_PASSWORD" { print $4 }' wp-config.php` -h localhost `awk -F\' '$2 == "DB_NAME" { print $4 }' wp-config.php` -e "UPDATE wp_options SET option_value = 'a:0:{}' WHERE option_name = 'active_plugins'
+
+Re-enable the plugins that just got turned off:
+mysql -u `awk -F\' '$2 == "DB_USER" { print $4 }' wp-config.php` -p`awk -F\' '$2 == "DB_PASSWORD" { print $4 }' wp-config.php` -h localhost `awk -F\' '$2 == "DB_NAME" { print $4 }' wp-config.php` -e "UPDATE wp_options SET option_value = '$DPLUG' WHERE option_name = 'active_plugins';" && unset DPLUG
+

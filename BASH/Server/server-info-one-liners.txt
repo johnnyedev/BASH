@@ -1,0 +1,24 @@
+
+#Kernel Update & Last Reboot
+echo -e "\nKernel Last Updated: `grep Updated: /var/log/yum.log | grep -i kernel | tail -1 | awk '{print $1, $2, $3}'`\nLast Reboot: `last reboot|awk '{print $5, $6, $7, $8}'|head -n 1`\n"
+ 
+#OS Version
+echo -e "\nOS Version: `cat /etc/*release* | grep release | uniq`\n"
+ 
+#cPanel/Plesk Version - Havent tested on Plesk
+if [ -f /usr/local/cpanel/cpanel ] ; then echo -e "\ncPanel Version: `/usr/local/cpanel/cpanel -V`\nLatest Is: 74\n" ; elif [ -f /usr/local/psa/.release ] ; then echo -e "\nPlesk Version: `plesk version | grep Product | grep -P "Plesk".*|awk -F\: '{print $2}'`\nLatest Is:      Plesk Onyx 17.8\n" ; fi
+ 
+#Memory Usage
+DIAGMEM="`free -m | grep "Mem"`" ; echo -e "\nMemory Usage -\nTotal Memory: `echo $DIAGMEM|awk '{print $2/1024}'| grep -oP "[0-9].*\.[0-9]"`GB\nUsed Memory: `echo $DIAGMEM|awk '{print $3/1024}'| grep -oP "[0-9].*\.[0-9]"`GB\nFree Memory: `echo $DIAGMEM|awk '{print $4/1024}'| grep -oP "[0-9].*\.[0-9]"`GB\nAvailable Memory: `echo $DIAGMEM|awk '{print $7/1024}'| grep -oP "[0-9].*\.[0-9]"`GB\n"
+ 
+#CPU Cores and Usage
+echo -e "\nPhysical Cores: $(grep ^cpu\\scores /proc/cpuinfo | uniq |  awk '{print $4}')\nHyper Threaded Cores: `grep -c ^processor /proc/cpuinfo`\n" ; HIU=`sar | awk '{print $9}'| grep -o "[0-9].*" | sort -n | head -n 1` ; echo -e "Today's Average CPU Usage -\nCPU Idle: `sar | awk '{print $9}'| grep -o "[0-9].*" | awk '{ sum += $1; n++ } END { if (n > 0) print sum / n; }'`%\nCPU Used: `sar | awk '{print $9}'| grep -o "[0-9].*" | awk '{ sum += $1; n++ } END { if (n > 0) print sum / n; }'|awk '{print (100 - $1)}'`%\nHighest Usage: `sar | awk '{print $9}'| grep -o "[0-9].*" | sort -n | head -n 1 | awk '{print ( 100 - $1 ) }'`% at `sar | grep $HIU | awk '{print $1, $2}'`\n" ; HIO=`sar -f /var/log/sa/sa$(date|awk '{print $3}'|awk '{print ( $1 - 1 ) }'|sed 's/\<[0-9]\>/0&/') | awk '{print $9}'| grep -o "[0-9].*" | sort -n | head -n 1` ; echo -e "Yesterday's Average CPU Usage -\nCPU Idle: `sar -f /var/log/sa/sa$(date|awk '{print $3}'|awk '{print ( $1 - 1 ) }'|sed 's/\<[0-9]\>/0&/') | awk '{print $9}'| grep -o "[0-9].*" | awk '{ sum += $1; n++ } END { if (n > 0) print sum / n; }'`%\nCPU Used: `sar -f /var/log/sa/sa$(date|awk '{print $3}'|awk '{print ( $1 - 1 ) }'|sed 's/\<[0-9]\>/0&/') | awk '{print $9}'| grep -o "[0-9].*" | awk '{ sum += $1; n++ } END { if (n > 0) print sum / n; }'|awk '{print (100 - $1)}'`%\nHighest Usage: `sar -f /var/log/sa/sa$(date|awk '{print $3}'|awk '{print ( $1 - 1 ) }'|sed 's/\<[0-9]\>/0&/') | awk '{print $9}'| grep -o "[0-9].*" | sort -n | head -n 1 | awk '{print ( 100 - $1 ) }'`% at `sar -f /var/log/sa/sa$(date|awk '{print $3}'|awk '{print ( $1 - 1 ) }'|sed 's/\<[0-9]\>/0&/') | grep $HIO | awk '{print $1, $2}'`\n"
+ 
+#Disk Usage
+df -h | awk '{print $1 " Used: "$3 "/" $2, $5" Used"}'|grep -v Filesystem|column -t | sort -rnk 4 | grep -v "0%.*Used"
+ 
+#Internet Speed
+echo -e "\nInternet Speeds (This may take a minute): ";echo -e "`curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python - | grep "Download\|Upload"`\n"
+ 
+#Zabbix Agent
+echo -e "\nZabbix Agent Check: \n`service zabbix-agent status`\n"
