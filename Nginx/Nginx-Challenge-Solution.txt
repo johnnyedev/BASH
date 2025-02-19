@@ -1,4 +1,5 @@
-# Redirect Solution 
+# Challenge written by https://github.com/jaredwyns
+# Solution by https://github.com/johnnyedev
 
 # Variables for each condition of the redirect
 set $is_uri 0;
