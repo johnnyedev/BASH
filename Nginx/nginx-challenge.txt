@@ -1,13 +1,24 @@
+# Challenge written by https://github.com/jaredwyns
+
 Redirect:
 https://YOURDOMAIN/?usless_value=9nasdp0inok112_189%666&magical_herpderp=GjVdvE9gGjVdvE9g&[please_stop!=61%12987
 
 To:
 https://google.com with the same args, in reverse order. (stop, magic, value)
 
-1. I want it to redirect only when the magical_herpderp is GjVdvE9gGjVdvE9g, but when I get any value for usless_value or [please_stop! except for the condition below:
+Original URL Args:
+useless_value magical_herpderp [please_stop!
+
+End Result Args:
+[please_stop! magical_herpderp useless_value
+
+
+
+
+1. I want it to redirect only when the magical_herpderp is GjVdvE9gGjVdvE9g and when I get any value for usless_value or [please_stop! with below exceptions.
 2. I don't want it to redirect when usless_value is equal to "WhYDoThiS", but I do want it to redirect when it's "whydothis"
-3. Also, I want it to redirect over https://, but not over HTTP.
-4. Except when usless_value is "whydothis", it should also redirect over HTTP.
+3. Also, I want it to redirect over https://, but not over http://.
+4. Except when usless_value is "whydothis", it should also redirect over http://.
 5. This rule should redirect only on the homepage and on the sub-path ^/jaredwyns/
 
 Another example rule that may help:
@@ -17,129 +28,3 @@ rewrite ^ /forum/topic/$arg_forum_thread_id? permanent;
 }
 
 
-Original URL
-useless_value magical_herpderp [please_stop!
-
-End Result
-[please_stop! magical_herpderp useless_value
-
-----------------------------------------
-
-# Variables for each condition of the redirect
-set $is_uri 0;
-set $is_argMH 0;
-set $is_argPS 0;
-set $val_argPS 0;
-set $is_argUV 0;
-set $is_not_arg_UV_val_WDT 0;
-set $is_arg_UV_val_wdt 0;
-set $is_domain 0;
-set $is_http 0;
-set $is_https 0;
-
-# Check if our URI is homepage or contains /jaredwyns
-if ($uri ~* "(^/$|^/jaredwyns/)") {
-set $is_uri 1;
-}
-
-# Check if arg magical_herpderp = GjVdvE9gGjVdvE9g
-if ($arg_magical_herpderp = "GjVdvE9gGjVdvE9g") {
-set $is_argMH 1;
-}
-
-# Check to confirm if [please_stop! exists
-if ($arg_[please_stop!) {
-set $is_argPS 1;
-}
-
-# Carry please_stop arg value
-if ($args ~* "please_stop!=(.*)") {
-set $val_argPS $1;
-}
-
-# Check to confirm if usless_value exists
-if ($arg_usless_value) {
-set $is_argUV 1;
-}
-
-# Check to confirm the arg is not usless_value = "WhYDoThiS"
-if ($arg_usless_value != "WhYDoThiS") {
-set $is_not_arg_UV_val_WDT 1;
-}
-
-# Check to confirm if usless_value = "whydothis"
-if ($arg_usless_value = "whydothis") {
-set $is_arg_UV_val_wdt 1;
-}
-
-# Match Specific Domain
-if ( $host = 'supertester.wpengine.com') {
-set $is_domain 1;
-}
-
-# Check if we are on HTTP
-if ($http_x_forwarded_proto != "https") {
-set $is_http 1;
-}
-
-# Check if we are on HTTPS
-if ( $http_x_forwarded_proto = "https") {
-set $is_https 1;
-}
-
-# Set Master Variable
-set $conditionCHK "$is_uri:$is_argMH:$is_argPS:$is_argUV:$is_not_arg_UV_val_WDT:$is_arg_UV_val_wdt:$is_domain:$is_http:$is_https";
-
-### Do our rewrites depending on conditions ###
-# Scenario 1 - redirect if
-# URI matches ^/$ or ^/jaredwyns/
-# all 3 args present - useless_value magical_herpderp [please_stop!
-# magical_herpderp = GjVdvE9gGjVdvE9g
-# useless_value does not equal "WhYDoThiS"
-# useless_value does not equal "whydothis"
-# We are on HTTPS
-if ($conditionCHK = "1:1:1:1:1:0:1:0:1") {
-rewrite (.*) https://google.com/?[please_stop!=$val_argPS&magical_herpderp=GjVdvE9gGjVdvE9g&usless_value=$arg_usless_value?;
-}
-
-# Scenario 2 - redirect if
-# URI matches ^/$ or ^/jaredwyns/
-# all 3 args present - useless_value magical_herpderp [please_stop!
-# magical_herpderp = GjVdvE9gGjVdvE9g
-# useless_value does not equal "WhYDoThiS"
-# useless_value does equal "whydothis"
-# We are on HTTP
-if ($conditionCHK = "1:1:1:1:1:1:1:1:0") {
-rewrite (.*) https://google.com/?[please_stop!=$val_argPS&$arg_[&magical_herpderp=GjVdvE9gGjVdvE9g&usless_value=$arg_usless_value?;
-}
-
-# Scenario 3 - redirect if
-# URI matches ^/$ or ^/jaredwyns/
-# all 3 args present - useless_value magical_herpderp [please_stop!
-# magical_herpderp = GjVdvE9gGjVdvE9g
-# useless_value does not equal "WhYDoThiS"
-# useless_value does equal "whydothis"
-# We are on HTTPS
-if ($conditionCHK = "1:1:1:1:1:1:1:0:1") {
-rewrite (.*) https://google.com/?[please_stop!=$val_argPS&magical_herpderp=GjVdvE9gGjVdvE9g&usless_value=$arg_usless_value?;
-}
-----------------------------------------
-Test the above conditions with these URLS:
-
-S1:
-https://supertester.wpengine.com/?usless_value=s1&magical_herpderp=GjVdvE9gGjVdvE9g&[please_stop!=s1
-----
-https://supertester.wpengine.com/jaredwyns/?usless_value=s1s1&magical_herpderp=GjVdvE9gGjVdvE9g&[please_stop!=s1s1
-
-
-S2:
-http://supertester.wpengine.com/?usless_value=whydothis&magical_herpderp=GjVdvE9gGjVdvE9g&[please_stop!=s2
-----
-http://supertester.wpengine.com/jaredwyns/?usless_value=whydothis&magical_herpderp=GjVdvE9gGjVdvE9g&[please_stop!=s2s2
-
-
-S3:
-https://supertester.wpengine.com/?usless_value=whydothis&magical_herpderp=GjVdvE9gGjVdvE9g&[please_stop!=s3
-----
-https://supertester.wpengine.com/jaredwyns/?usless_value=whydothis&magical_herpderp=GjVdvE9gGjVdvE9g&[please_stop!=s3s3
-----
