@@ -1,0 +1,45 @@
+import "tfplan/v2" as tfplan
+
+// Grab list of all PLANNED resources with type 'google_sql_database_instance'
+dbGCP = filter tfplan.planned_values.resources as _, pv { pv.type is "google_sql_database_instance" }
+
+// Check how many databases there are from what we filterd through above
+dbCount = length(keys(dbGCP))
+print("Number of Databases Found:", dbCount)
+
+//Function to check if the value is present and if it's true or something else
+myfunc = func(theDB) {
+  // Grab key values
+  myKeyValues = theDB.values.settings[0]
+  // print("The value of myKeyValues for database:", theDB.name, myKeyValues) //Uncomment to confirm value of myKeyValues
+  
+  // Check to see if deletion_protection_enabled is within the keys/values
+  if myKeyValues contains "deletion_protection_enabled" {
+    isPresent = true
+  } else {
+    isPresent = false
+  }
+  
+  if isPresent is true {
+    if theDB.values.settings[0].deletion_protection_enabled is true {
+      print("deletion_protection_enabled IS SET and the value is TRUE for database:", theDB.name)
+      return true
+    } else {
+      print("deletion_protection_enabled IS SET but the value is NOT TRUE for database:", theDB.name)
+      return false
+    }
+    //^End theDB if statement
+  } else {
+    print("deletion_protection_enabled IS NOT SET for database:", theDB.name)
+    return false
+  }
+  //^End isPresent if statement    
+}
+//^End myFunc function
+
+//Check ALL found databases,pass each database to the function to check if value exists, if exists, check if true or false
+dbDeleteProtection = all dbGCP as _, eachDB { myfunc(eachDB) }
+//print("The value of dbTest:", dbTest) //Uncomment to confirm value of dbTest
+
+//Main Rule
+main = rule { dbDeleteProtection }
