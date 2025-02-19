@@ -1,0 +1,35 @@
+import "tfplan/v2" as tfplan
+import "json"
+
+//How can we look for members equal to allUsers and verify only the storage.legacyObjectReader role is granted to this member in this situation?
+requiredMember = "allUsers"
+requiredRole = "roles/storage.legacyObjectReader"
+
+// Take a given binding and determine whether a given 'List' member has a given required role in 'String' role 
+// In the attached policy's data
+policyDataIsCompliant = func(b, m, r) {
+	return m in b.members and b.role is r
+}
+
+allBucketIAMPolicies = filter tfplan.resource_changes as _, resource_changes {
+	resource_changes.type is "google_storage_bucket_iam_policy" and
+		resource_changes.mode is "managed" and
+		(resource_changes.change.actions contains "create" or
+			resource_changes.change.actions is ["update"])
+}
+
+checkPolicyDataCompliance = func() {
+compliant = false
+for allBucketIAMPolicies as _, policy {
+	for json.unmarshal(policy.change.after.policy_data).bindings as _, binding {
+    print(binding)
+  	if(policyDataIsCompliant(binding, requiredMember, requiredRole)){
+    	compliant = true
+    	}
+  	}
+	}
+  return compliant
+}
+
+// Checks whether 'allUsers' has a `roles/storage.legacyObjectReader` role
+main = rule { checkPolicyDataCompliance() }
