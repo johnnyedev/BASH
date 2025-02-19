@@ -22,10 +22,5 @@ End Result Args:
 4. Except when usless_value is "whydothis", it should also redirect over http://.
 5. This rule should redirect only on the homepage and on the sub-path ^/jaredwyns/
 
-Another example rule that may help:
-
-if ( $arg_forum_thread_id ) {
-rewrite ^ /forum/topic/$arg_forum_thread_id? permanent;
-}
 
 
