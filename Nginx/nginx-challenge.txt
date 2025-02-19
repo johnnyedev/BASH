@@ -1,4 +1,5 @@
 # Challenge written by https://github.com/jaredwyns
+# Solution by https://github.com/johnnyedev
 
 Redirect:
 https://YOURDOMAIN/?usless_value=9nasdp0inok112_189%666&magical_herpderp=GjVdvE9gGjVdvE9g&[please_stop!=61%12987
