@@ -1,0 +1,26 @@
+resource_changes = {
+	"bucket-iam-policy": {
+		"address": "bucket-iam-policy",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"bucket":      "test-tst-bucket",
+				"policy_data": "{\"bindings\":[{\"members\":[\"allUsers\"],\"role\":\"roles/storage.legacyObjectReader\"},{\"members\":[\"serviceAccount:test@gcp-gfs-test.iam.gserviceaccount.com\"],\"role\":\"roles/storage.objectAdmin\"}]}",
+			},
+			"after_unknown": {
+				"etag": true,
+				"id":   true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          null,
+		"mode":           "managed",
+		"module_address": "module.test-static-content-hosting",
+		"name":           "storage-bucket-iam-policy",
+		"provider_name":  "registry.terraform.io/hashicorp/google",
+		"type":           "google_storage_bucket_iam_policy",
+	},
+}
